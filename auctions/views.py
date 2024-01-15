@@ -134,9 +134,14 @@ def place_bid(request, listing_id):
 @login_required
 def close_listing(request, listing_id):
     listing = get_object_or_404(Listing, pk=listing_id)
-    listing.active = False
-    listing.save()
-    return redirect('index')
+    if request.user == listing.user and request.method == 'POST':
+        listing.active = False
+        listing.save()
+        messages.success(request, 'The listing has been successfully closed.')
+        return redirect('index')
+    else:
+        messages.error(request, 'You are not authorized to close this listing.')
+        return redirect('listing', listing_id=listing_id)
 
 # View closed listings
 @login_required
