@@ -32,6 +32,28 @@
         <button type="submit" class="btn btn-warning mb-3">Close Listing</button>
     </form>
     {% endif %}
+    <hr>
+    <br>
+    <!-- Comment form -->
+    {% if user.is_authenticated %}
+    <form action="{% url 'listing' listing.id %}" method="post">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit">Submit Comment</button>
+    </form>
+    {% endif %}
+    <br>
+    <hr>
+    <!-- Display comments -->
+    <div class="comments">
+        <h3>Comment section</h3>
+        {% for comment in comments %}
+        <div class="comment">
+            <strong>{{ comment.user.username }}</strong>
+            <p>{{ comment.text }}</p>
+        </div>
+        {% endfor %}
+    </div>
 
     {% if error_message %}
         <p><strong>{{ error_message }}</strong></p>

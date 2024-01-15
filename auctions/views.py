@@ -3,7 +3,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from .forms import ListingForm, BidForm
+from .forms import ListingForm, BidForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import User, Listing, Bid, Comment, Watchlist
@@ -81,14 +81,21 @@ def create_listing(request):
 # View a listing
 def listing_detail(request, listing_id):
     listing = get_object_or_404(Listing, pk=listing_id)
-    highest_bid = Bid.objects.filter(listing=listing).order_by('-bid_amount').first()
-    user_watchlist_ids = []
-    if request.user.is_authenticated:
-        user_watchlist_ids = Watchlist.objects.filter(user=request.user).values_list('listing_id', flat=True)
+    comments = Comment.objects.filter(listing=listing)
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.user = request.user
+            new_comment.listing = listing
+            new_comment.save()
+            return redirect('listing', listing_id=listing_id)
+    else:
+        comment_form = CommentForm()
     return render(request, 'auctions/listing-detail.html', {
         'listing': listing,
-        'highest_bid': highest_bid,
-        'user_watchlist_ids': user_watchlist_ids
+        'comments': comments,
+        'comment_form': comment_form
     })
 
 # Add a listing to a watchlist
