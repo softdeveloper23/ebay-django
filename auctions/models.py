@@ -13,6 +13,8 @@ class Listing(models.Model):
     image_url = models.URLField(blank=True, null=True)
     category = models.CharField(max_length=50, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='won_listings')
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title

@@ -24,6 +24,14 @@
             <input type="submit" value="Place Bid">
         </form>
     {% endif %}
+    <br>
+    <hr>
+    {% if user.is_authenticated and user == listing.user %}
+        <form action="{% url 'close-listing' listing.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning mb-3">Close Auction</button>
+        </form>
+    {% endif %}
 
     {% if error_message %}
         <p><strong>{{ error_message }}</strong></p>

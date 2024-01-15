@@ -5,12 +5,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from .forms import ListingForm, BidForm
 from django.contrib.auth.decorators import login_required
-
+from django.contrib import messages
 from .models import User, Listing, Bid, Comment, Watchlist
 
 
 def index(request):
-        active_listings = Listing.objects.all()  # Assuming all listings are active for simplicity
+        active_listings = Listing.objects.filter(active=True)  # This line filters active listings
         return render(request, "auctions/index.html", {'listings': active_listings})
 
 def login_view(request):
@@ -129,3 +129,19 @@ def place_bid(request, listing_id):
     else:
         form = BidForm()
     return render(request, 'auctions/listing-detail.html', {'listing': listing, 'form': form})
+
+# Close a listing
+@login_required
+def close_listing(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+    if request.user == listing.user:
+        highest_bid = Bid.objects.filter(listing=listing).order_by('-bid_amount').first()
+        if highest_bid:
+            listing.delete()  # This line deletes the listing from the database
+            messages.success(request, 'You closed the Auction! The winner is ' + highest_bid.user.username)
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            messages.error(request, 'No bids placed on this listing yet.')
+    else:
+        messages.error(request, 'You are not authorized to close this listing.')
+    return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
