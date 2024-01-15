@@ -26,10 +26,10 @@
     {% endif %}
     <br>
     <hr>
-    {% if user.is_authenticated and user == listing.user %}
+    {% if user.is_authenticated %}
         <form action="{% url 'close-listing' listing.id %}" method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-warning mb-3">Close Auction</button>
+            <button type="submit" class="btn btn-warning mb-3">Close Listing</button>
         </form>
     {% endif %}
 

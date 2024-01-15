@@ -134,14 +134,12 @@ def place_bid(request, listing_id):
 @login_required
 def close_listing(request, listing_id):
     listing = get_object_or_404(Listing, pk=listing_id)
-    if request.user == listing.user:
-        highest_bid = Bid.objects.filter(listing=listing).order_by('-bid_amount').first()
-        if highest_bid:
-            listing.delete()  # This line deletes the listing from the database
-            messages.success(request, 'You closed the Auction! The winner is ' + highest_bid.user.username)
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            messages.error(request, 'No bids placed on this listing yet.')
-    else:
-        messages.error(request, 'You are not authorized to close this listing.')
-    return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
+    listing.active = False
+    listing.save()
+    return redirect('index')
+
+# View closed listings
+@login_required
+def closed_listings(request):
+    closed_listings = Listing.objects.filter(active=False)  # This line filters closed listings
+    return render(request, "auctions/closed-listings.html", {'listings': closed_listings})
