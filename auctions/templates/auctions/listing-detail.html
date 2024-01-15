@@ -3,7 +3,7 @@
 {% block body %}
     <h2>{{ listing.title }}</h2>
     <p>{{ listing.description }}</p>
-    <p>Current bid: {{ listing.starting_bid }}</p>
+    <p>Current bid: {% if highest_bid %}{{ highest_bid.bid_amount }}{% else %}{{ listing.starting_bid }}{% endif %}</p>
     {% if listing.image_url %}
         <img src="{{ listing.image_url }}" alt="Listing image">
     {% endif %}

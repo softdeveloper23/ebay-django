@@ -82,11 +82,13 @@ def create_listing(request):
 # View a listing
 def listing_detail(request, listing_id):
     listing = get_object_or_404(Listing, pk=listing_id)
+    highest_bid = Bid.objects.filter(listing=listing).order_by('-bid_amount').first()
     user_watchlist_ids = []
     if request.user.is_authenticated:
         user_watchlist_ids = Watchlist.objects.filter(user=request.user).values_list('listing_id', flat=True)
     return render(request, 'auctions/listing-detail.html', {
         'listing': listing,
+        'highest_bid': highest_bid,
         'user_watchlist_ids': user_watchlist_ids
     })
 
