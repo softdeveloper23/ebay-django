@@ -6,12 +6,13 @@ from django.urls import reverse
 from .forms import ListingForm
 from django.contrib.auth.decorators import login_required
 
-from .models import User
+from .models import User, Listing, Bid, Comment
 
 
 def index(request):
-    return render(request, "auctions/index.html")
-
+    def index(request):
+        active_listings = Listing.objects.all()  # Assuming all listings are active for simplicity
+        return render(request, "auctions/index.html", {'listings': active_listings})
 
 def login_view(request):
     if request.method == "POST":
