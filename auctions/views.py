@@ -79,7 +79,6 @@ def create_listing(request):
     return render(request, 'auctions/create-listing.html', {'form': form})
 
 # View a listing
-# View a listing
 def listing_detail(request, listing_id):
     listing = get_object_or_404(Listing, pk=listing_id)
     highest_bid = Bid.objects.filter(listing=listing).order_by('-bid_amount').first()
