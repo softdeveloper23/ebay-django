@@ -15,5 +15,18 @@
             <a href="{% url 'add-to-watchlist' listing.id %}">Add to Watchlist</a>
         {% endif %}
     {% endif %}
+    <hr>
+    <br>
+    {% if user.is_authenticated %}
+        <form action="{% url 'place-bid' listing.id %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Place Bid">
+        </form>
+    {% endif %}
+
+    {% if error_message %}
+        <p><strong>{{ error_message }}</strong></p>
+    {% endif %}
 
 {% endblock %}

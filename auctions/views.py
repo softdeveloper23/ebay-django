@@ -3,7 +3,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from .forms import ListingForm
+from .forms import ListingForm, BidForm
 from django.contrib.auth.decorators import login_required
 
 from .models import User, Listing, Bid, Comment, Watchlist
@@ -109,3 +109,22 @@ def remove_from_watchlist(request, listing_id):
 def watchlist(request):
     user_watchlist = Watchlist.objects.filter(user=request.user)
     return render(request, 'auctions/watchlist.html', {'watchlist': user_watchlist})
+
+# Place a bid on a listing
+@login_required
+def place_bid(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+    if request.method == 'POST':
+        form = BidForm(request.POST)
+        if form.is_valid():
+            new_bid = form.save(commit=False)
+            new_bid.user = request.user
+            new_bid.listing = listing
+            if new_bid.bid_amount >= listing.starting_bid and (not listing.bids.all() or new_bid.bid_amount > listing.bids.all().order_by('-bid_amount').first().bid_amount):
+                new_bid.save()
+                return HttpResponseRedirect(reverse('listing', args=(listing_id,)))
+            else:
+                return render(request, 'auctions/listing-detail.html', {'listing': listing, 'error_message': 'Your bid must be at least as large as the starting bid and must be greater than any other bids.'})
+    else:
+        form = BidForm()
+    return render(request, 'auctions/listing-detail.html', {'listing': listing, 'form': form})

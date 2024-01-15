@@ -1,5 +1,5 @@
 from django import forms
-from .models import Listing
+from .models import Listing, Bid
 
 class ListingForm(forms.ModelForm):
     class Meta:
@@ -12,3 +12,8 @@ class ListingForm(forms.ModelForm):
             'image_url': forms.URLInput(attrs={'placeholder': 'Image URL (optional)'}),
             'category': forms.TextInput(attrs={'placeholder': 'Category (optional)'})
         }
+
+class BidForm(forms.ModelForm):
+    class Meta:
+        model = Bid
+        fields = ['bid_amount']
